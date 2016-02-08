@@ -33,7 +33,7 @@ import setuptools
 
 if __name__ == "__main__":
     setuptools.setup(
-        name="flask-autorouter",
+        name="cacheable",
         version=__version__,
         url="https://github.com/d1hotpep/cacheable",
         license="MIT",
