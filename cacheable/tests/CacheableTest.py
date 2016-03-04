@@ -4,10 +4,10 @@ import os
 import sys
 import unittest
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path = [ os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')) ] + sys.path
 
 from cacheable import Cacheable
-from DictAdapter import Adapter
+from cacheable.adapter import DictAdapter
 
 
 class LengthCacheable(Cacheable):
@@ -26,7 +26,7 @@ class LengthV2Cacheable(Cacheable):
 
 class CacheableTest(unittest.TestCase):
     def setUp(self):
-        Cacheable.init(Adapter)
+        Cacheable.init(DictAdapter)
 
 
     def test_basic(self):

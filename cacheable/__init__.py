@@ -2,33 +2,10 @@ __author__ = 'dpepper'
 __version__ = '0.1.0'
 
 
+from inspect import isclass
 import types
 
-
-class CacheableAdapter:
-    @staticmethod
-    def multiget(keys):
-        raise NotImplementedError
-
-    @classmethod
-    def get(cls, key):
-        return cls.multiget([ key ]).get(key)
-
-    @staticmethod
-    def multiset(data):
-        raise NotImplementedError
-
-    @classmethod
-    def set(cls, key, value):
-        cls.multiset({ key : value })
-
-    @staticmethod
-    def delete(keys):
-        raise NotImplementedError
-
-    @staticmethod
-    def list(prefix, limit=None):
-        raise NotImplementedError
+from adapter import CacheableAdapter
 
 
 class Cacheable:
@@ -41,8 +18,7 @@ class Cacheable:
 
     @classmethod
     def init(cls, adapter):
-        assert isinstance(adapter, (type, types.ClassType)),  \
-            'expected a class, found %s' % type(adapter)
+        assert isclass(adapter), 'expected a class, found %s' % type(adapter)
         assert issubclass(adapter, CacheableAdapter),  \
             'expected a %s, found %s' % (CacheableAdapter.__name__, adapter)
 
