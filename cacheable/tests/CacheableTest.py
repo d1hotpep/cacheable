@@ -30,12 +30,12 @@ class CacheableTest(unittest.TestCase):
 
 
     def test_basic(self):
-        self.assertFalse(LengthCacheable.list(''))
+        self.assertFalse(LengthCacheable.list())
 
         res = LengthCacheable.get('abc')
         self.assertEquals(res, 3)
 
-        self.assertEquals(len(LengthCacheable.list('')), 1)
+        self.assertEquals(len(LengthCacheable.list()), 1)
 
         res = LengthCacheable.get('z')
         self.assertEquals(res, 1)
@@ -46,15 +46,15 @@ class CacheableTest(unittest.TestCase):
 
     def test_version(self):
         # assert cache persisted
-        self.assertTrue(LengthCacheable.list(''))
+        self.assertTrue(LengthCacheable.list())
 
         # but this one is new
-        self.assertFalse(LengthV2Cacheable.list(''))
+        self.assertFalse(LengthV2Cacheable.list())
 
         res = LengthCacheable.get('abc')
         self.assertEquals(res, 3)
-        self.assertTrue(LengthCacheable.list(''))
-        self.assertFalse(LengthV2Cacheable.list(''))
+        self.assertTrue(LengthCacheable.list())
+        self.assertFalse(LengthV2Cacheable.list())
 
         res = LengthV2Cacheable.get('abc')
         self.assertEquals(res, 6)

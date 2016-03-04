@@ -24,7 +24,7 @@ class CacheableAdapter:
         raise NotImplementedError
 
     @staticmethod
-    def list(prefix, limit=None):
+    def list(prefix=None, limit=None):
         raise NotImplementedError
 
 

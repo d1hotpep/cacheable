@@ -18,8 +18,8 @@ class DictAdapter(CacheableAdapter):
             del cls.data[key]
 
     @classmethod
-    def list(cls, prefix, limit=None):
-        res = { k : v for k, v in cls.data.items() if k.startswith(prefix) }
+    def list(cls, prefix=None, limit=None):
+        res = { k : v for k, v in cls.data.items() if not prefix or k.startswith(prefix) }
 
         if limit:
             res = res[:limit]
