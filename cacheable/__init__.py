@@ -33,7 +33,7 @@ class CacheableAdapter:
 
 class Cacheable:
     ADAPTER = None
-    CACHE_VERSION = 1
+    VERSION = 1
 
 
     def __init__(self):
@@ -44,14 +44,14 @@ class Cacheable:
         assert isinstance(adapter, (type, types.ClassType)),  \
             'expected a class, found %s' % type(adapter)
         assert issubclass(adapter, CacheableAdapter),  \
-            'expected a CacheableAdapter, found %s' % adapter
+            'expected a %s, found %s' % (CacheableAdapter.__name__, adapter)
 
         cls.ADAPTER = adapter
 
 
     @classmethod
     def cachekey_prefix(cls):
-        return '%s:%s:' % (cls.__name__.lower(), cls.CACHE_VERSION)
+        return '%s:%s:' % (cls.__name__.lower(), cls.VERSION)
 
 
     @classmethod
