@@ -29,3 +29,9 @@ class CacheableAdapter:
 
 
 from DictAdapter import DictAdapter
+
+try:
+    import peewee
+    from PeeweeAdapter import PeeweeAdapter
+except ImportError:
+    pass
