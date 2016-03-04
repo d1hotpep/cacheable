@@ -16,7 +16,7 @@ class LengthCacheable(Cacheable):
         return { x : len(x) for x in keys }
 
 
-class LengthV2Cacheable(LengthCacheable):
+class LengthV2Cacheable(Cacheable):
     VERSION = 2
 
     @staticmethod
@@ -26,16 +26,16 @@ class LengthV2Cacheable(LengthCacheable):
 
 class CacheableTest(unittest.TestCase):
     def setUp(self):
-        Cacheable.init(Adapter())
+        Cacheable.init(Adapter)
 
 
-    def basic_test(self):
-        self.assertEmpty(LengthCacheable.list(prefix=''))
+    def test_basic(self):
+        self.assertFalse(LengthCacheable.list(''))
 
         res = LengthCacheable.get('abc')
         self.assertEquals(res, 3)
 
-        self.assertEquals(LengthCacheable.list(prefix=''), { 'abc' : 3 })
+        self.assertEquals(len(LengthCacheable.list('')), 1)
 
         res = LengthCacheable.get('z')
         self.assertEquals(res, 1)
@@ -44,14 +44,17 @@ class CacheableTest(unittest.TestCase):
         self.assertEquals(res, { 'abc' : 3, 'z' : 1 })
 
 
-    def versions_test(self):
-        self.assertEmpty(LengthCacheable.list(prefix=''))
-        self.assertEmpty(LengthV2Cacheable.list(prefix=''))
+    def test_version(self):
+        # assert cache persisted
+        self.assertTrue(LengthCacheable.list(''))
+
+        # but this one is new
+        self.assertFalse(LengthV2Cacheable.list(''))
 
         res = LengthCacheable.get('abc')
         self.assertEquals(res, 3)
-        self.assertNotEmpty(LengthCacheable.list(prefix=''))
-        self.assertEmpty(LengthV2Cacheable.list(prefix=''))
+        self.assertTrue(LengthCacheable.list(''))
+        self.assertFalse(LengthV2Cacheable.list(''))
 
         res = LengthV2Cacheable.get('abc')
         self.assertEquals(res, 6)
