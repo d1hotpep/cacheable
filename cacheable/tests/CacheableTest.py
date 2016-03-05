@@ -26,7 +26,8 @@ class LengthV2Cacheable(Cacheable):
 
 class CacheableTest(unittest.TestCase):
     def setUp(self):
-        Cacheable.init(DictAdapter)
+        self.adapter = DictAdapter()
+        Cacheable.init(self.adapter)
 
 
     def test_basic(self):
@@ -45,16 +46,19 @@ class CacheableTest(unittest.TestCase):
 
 
     def test_version(self):
-        # assert cache persisted
+        # local cache persisted
         self.assertTrue(LengthCacheable.list())
 
-        # but this one is new
+        # but this one is new too
         self.assertFalse(LengthV2Cacheable.list())
 
         res = LengthCacheable.get('abc')
         self.assertEquals(res, 3)
         self.assertTrue(LengthCacheable.list())
         self.assertFalse(LengthV2Cacheable.list())
+
+        res = LengthV2Cacheable.get('a')
+        self.assertEquals(res, 2)
 
         res = LengthV2Cacheable.get('abc')
         self.assertEquals(res, 6)

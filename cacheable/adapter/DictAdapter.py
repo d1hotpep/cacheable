@@ -1,25 +1,49 @@
+from time import time
+
 from . import CacheableAdapter
 
 
 class DictAdapter(CacheableAdapter):
-    data = {}
+    def __init__(self):
+        self.data = {}
 
-    @classmethod
-    def multiget(cls, keys):
-        return { k : v for k, v in cls.data.items() if k in keys }
+    def multiget(self, keys):
+        ts = time()
 
-    @classmethod
-    def multiset(cls, data):
-        cls.data.update(data)
+        res = {}
+        for k, v in self.data.items():
+            if k in keys:
+                if not v[1] or v[1] > ts:
+                    res[k] = v[0]
 
-    @classmethod
-    def delete(cls, keys):
+        return res
+
+
+    def multiset(self, data, ttl=None):
+        if ttl:
+            xts = int(time() + ttl)
+        else:
+            xts = 0
+
+        data = { k : (v, xts) for k, v in data.items() }
+
+        self.data.update(data)
+
+
+    def delete(self, keys):
         for key in keys:
-            del cls.data[key]
+            if self.data.has_key(key):
+                del self.data[key]
 
-    @classmethod
-    def list(cls, prefix=None, limit=None):
-        res = { k : v for k, v in cls.data.items() if not prefix or k.startswith(prefix) }
+
+    def list(self, prefix=None, limit=None):
+        ts = time()
+
+        res = {}
+        for k, v in self.data.items():
+            if not prefix or k.startswith(prefix):
+                if not v[1] or v[1] > ts:
+                    res[k] = v[0]
 
         if limit:
             res = res[:limit]

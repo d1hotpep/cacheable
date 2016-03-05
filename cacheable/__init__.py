@@ -2,27 +2,28 @@ __author__ = 'dpepper'
 __version__ = '0.1.0'
 
 
-from inspect import isclass
 import types
 
 from adapter import CacheableAdapter
+from adapter import DictAdapter
 
 
 class Cacheable:
-    ADAPTER = None
     VERSION = 1
+    TTL = 0
+    adapter = None
 
 
     def __init__(self):
-        raise Exception('usage error, call init()')
+        raise Exception('use Cacheable.init()')
 
-    @classmethod
-    def init(cls, adapter):
-        assert isclass(adapter), 'expected a class, found %s' % type(adapter)
-        assert issubclass(adapter, CacheableAdapter),  \
+    @staticmethod
+    def init(adapter=None):
+        assert isinstance(adapter, CacheableAdapter),  \
             'expected a %s, found %s' % (CacheableAdapter.__name__, adapter)
 
-        cls.ADAPTER = adapter
+        if not isinstance(adapter, DictAdapter):
+            Cacheable.adapter = adapter
 
 
     @classmethod
@@ -49,23 +50,24 @@ class Cacheable:
     def multiget(cls, keys):
         cachekeys = cls.cachekeys(keys)
 
-        if not hasattr(cls, 'LOCAL_CACHE'):
+        if not hasattr(cls, 'cache'):
             # initialize here instead of at class level so that each
             # subclass has it's own cache, instead of the same global one
-            cls.LOCAL_CACHE = {}
+            cls.cache = DictAdapter()
+
 
         # check local cache
         missing_keys = set(keys)
         for key in list(missing_keys):
-            if cls.LOCAL_CACHE.has_key(key):
+            if cls.cache.get(key):
                 missing_keys.remove(key)
 
         # check DB cache
-        if missing_keys:
-            kv = cls.ADAPTER.multiget([ cachekeys[key] for key in missing_keys ])
+        if missing_keys and cls.adapter:
+            kv = cls.adapter.multiget([ cachekeys[key] for key in missing_keys ])
             for key in list(missing_keys):
                 if kv.has_key(cachekeys[key]):
-                    cls.LOCAL_CACHE[key] = kv[cachekeys[key]]
+                    cls.cache.set(key, kv[cachekeys[key]], cls.TTL)
                     missing_keys.remove(key)
 
         if missing_keys:
@@ -73,10 +75,12 @@ class Cacheable:
             if set(data.keys()) != set(missing_keys):
                 raise Exception('%s::load_data() did not return all values' % cls.__name__)
 
-            cls.ADAPTER.multiset({ cachekeys[key] : value for key, value in data.items() })
-            cls.LOCAL_CACHE.update(data)
+            if cls.adapter:
+                cls.adapter.multiset({ cachekeys[key] : value for key, value in data.items() }, cls.TTL)
 
-        return { key : cls.LOCAL_CACHE[key] for key in keys }
+            cls.cache.multiset(data, cls.TTL)
+
+        return cls.cache.multiget(keys)
 
     @classmethod
     def get(cls, key):
@@ -92,17 +96,25 @@ class Cacheable:
 
         cachekeys = cls.cachekeys(keys)
 
-        cls.ADAPTER.delete(cachekeys.values())
-        for key in cachekeys:
-            if hasattr(cls, 'LOCAL_CACHE') and cls.LOCAL_CACHE.has_key(key):
-                del cls.LOCAL_CACHE[key]
+        if cls.adapter:
+            cls.adapter.delete(cachekeys.values())
+
+        if cls.adapter:
+            cls.cache.delete(keys)
 
 
     @classmethod
     def list(cls, limit=None):
         prefix = cls.cachekey_prefix()
-        return cls.ADAPTER.list(prefix, limit)
 
+        if cls.adapter:
+            res = cls.adapter.list(prefix, limit)
+        elif hasattr(cls, 'cache'):
+            res = cls.cache.list(limit=limit)
+        else:
+            res = []
+
+        return res
 
     @staticmethod
     def load_data(keys):

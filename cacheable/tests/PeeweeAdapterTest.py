@@ -20,10 +20,10 @@ class LengthCacheable(Cacheable):
 class PeeweeAdapterTest(unittest.TestCase):
     def setUp(self):
         database = SqliteDatabase(':memory:')
-        PeeweeAdapter.init(database)
+        self.adapter = PeeweeAdapter(database)
         PeeweeAdapter.create_table()
 
-        Cacheable.init(PeeweeAdapter)
+        Cacheable.init(self.adapter)
 
 
     def test_basic(self):

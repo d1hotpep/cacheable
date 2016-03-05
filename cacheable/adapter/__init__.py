@@ -3,28 +3,22 @@ Plumming to connect the Cacheable layer to some storage
 """
 
 class CacheableAdapter:
-    @staticmethod
-    def multiget(keys):
+    def multiget(self, keys):
         raise NotImplementedError
 
-    @classmethod
-    def get(cls, key):
-        return cls.multiget([ key ]).get(key)
+    def get(self, key):
+        return self.multiget([ key ]).get(key)
 
-    @staticmethod
-    def multiset(data):
+    def multiset(self, data, ttl=None):
         raise NotImplementedError
 
-    @classmethod
-    def set(cls, key, value):
-        cls.multiset({ key : value })
+    def set(self, key, value, ttl=None):
+        self.multiset({ key : value }, ttl)
 
-    @staticmethod
-    def delete(keys):
+    def delete(self, keys):
         raise NotImplementedError
 
-    @staticmethod
-    def list(prefix=None, limit=None):
+    def list(self, prefix=None, limit=None):
         raise NotImplementedError
 
 
