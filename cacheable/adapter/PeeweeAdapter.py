@@ -51,7 +51,8 @@ class PeeweeAdapter(CacheableAdapter, peewee.Model):
         else:
             keys = [ key_or_keys ]
 
-        super(self, self).delete().where(self.key << keys).execute()
+        cls = self.__class__
+        peewee.DeleteQuery(cls).where(cls.key << keys).execute()
 
 
     def list(self, prefix=None, limit=None):

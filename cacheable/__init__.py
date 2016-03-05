@@ -99,7 +99,7 @@ class Cacheable:
         if cls.adapter:
             cls.adapter.delete(cachekeys.values())
 
-        if cls.adapter:
+        if hasattr(cls, 'cache'):
             cls.cache.delete(keys)
 
 

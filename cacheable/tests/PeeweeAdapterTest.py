@@ -34,6 +34,9 @@ class PeeweeAdapterTest(unittest.TestCase):
 
         self.assertEquals(len(LengthCacheable.list()), 1)
 
+        LengthCacheable.delete('abc')
+        self.assertEquals(len(LengthCacheable.list()), 0)
+
         res = LengthCacheable.get('z')
         self.assertEquals(res, 1)
 
