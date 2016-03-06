@@ -32,8 +32,8 @@ cat CHANGES.txt >> $CHANGELOG
 cat $CHANGELOG > CHANGES.txt
 $EDITOR CHANGES.txt
 
-sed -i '' "s/__version__ = '.*'/__version__ = '$VERSION'/" setup.py
-sed -i '' "s/__version__ = '.*'/__version__ = '$VERSION'/" cacheable/__init__.py
+sed -i "s/__version__ = '.*'/__version__ = '$VERSION'/" setup.py
+sed -i "s/__version__ = '.*'/__version__ = '$VERSION'/" cacheable/__init__.py
 
 git commit -am "bump version and update changelog"
 git push
