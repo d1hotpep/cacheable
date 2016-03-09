@@ -59,7 +59,6 @@ class PeeweeAdapter(CacheableAdapter, peewee.Model):
         cls = self.__class__
 
         q = self.select(cls.key, cls.value)
-        # q = self.select(cls.key, cls.value, cls.mtime, cls.ttl)
 
         if prefix:
             if self.__db_type() == peewee.SqliteDatabase:
@@ -74,8 +73,7 @@ class PeeweeAdapter(CacheableAdapter, peewee.Model):
         if limit:
             q = q.limit(limit)
 
-        # res = { x[0] : x[1] for x in q.tuples() }
-        res = { x[0] : x[1:] for x in q.tuples() }
+        res = { x[0] : x[1] for x in q.tuples() }
 
         if prefix:
             res = { k[len(prefix):] : v for k, v in res.items() }
